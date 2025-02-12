@@ -1,0 +1,52 @@
+@import "tailwindcss";
+/* @import "base";
+@import "components";
+@import "utilities"; */
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.header-text {
+    font-size: 3.75rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 2rem;
+}
+.header-text .text-blue {
+    color: #1e40af;
+}
+.header-text .text-yellow {
+    color: #fbbf24;
+}
+.card-custom {
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    max-width: 28rem;
+    margin: auto;
+}
+.card-custom h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.card-custom p {
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+.form-control-custom {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.btn-custom {
+    background-color: #10b981;
+    color: white;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
