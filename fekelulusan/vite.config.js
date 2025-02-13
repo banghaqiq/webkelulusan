@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+// import { resolve } from 'path'
 // import { reactRouter } from "@react-router/dev/vite";
 // import tsconfigPaths from "vite-tsconfig-paths";
 // import tailwindcss from "@tailwindcss/vite";
@@ -12,6 +13,7 @@ export default defineConfig({
     // tailwindcss(),
     // reactRouter(),
     // tsconfigPaths()
-  ],
-  
+  ]
 })
+
+

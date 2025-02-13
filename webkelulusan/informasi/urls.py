@@ -3,5 +3,6 @@ from .views import *
 
 urlpatterns = [
     path('siswa/<int:siswa_id>/generate_skl/', generate_skl, name='generate_skl'),
-    path('cek-kelulusan/', cek_kelulusan, name='cek_kelulusan'),
+    # path('cek-kelulusan/', cek_kelulusan, name='cek_kelulusan'),
+    path('siswa/search/', SiswaSearchView.as_view(), name='siswa-search'),
 ]

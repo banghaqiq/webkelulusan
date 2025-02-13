@@ -4,68 +4,85 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint, faHome, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
+// import '../src/scss/styles.scss';
+import '../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 function HomePage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
+  // const handleSearch = async (e) => {
+  //   e.preventDefault();
+  //   const inputNISN = e.target.nisn.value.trim();
+    
+  //   if (!inputNISN) {
+  //     setError('NISN tidak boleh kosong');
+  //     return;
+  //   }
+
+  //   if (!/^\d+$/.test(inputNISN)) {
+  //     setError('NISN harus berupa angka');
+  //     return;
+  //   }
+
+  //   navigate(`/result/${inputNISN}`);
+  // };
+
   const handleSearch = async (e) => {
     e.preventDefault();
-    const inputNISN = e.target.nisn.value.trim();
-    
-    if (!inputNISN) {
+    const nisn = e.target.nisn.value;
+  
+    if (!nisn) {
       setError('NISN tidak boleh kosong');
       return;
     }
-
-    if (!/^\d+$/.test(inputNISN)) {
-      setError('NISN harus berupa angka');
-      return;
+  
+    try {
+      // const response = await axios.get(`http://127.0.0.1:8000/api/siswa/?nisn=${nisn}`);
+      const response = await axios.get(`http://localhost:8000/api/siswa/?nisn=${nisn}`);
+      if (response.data) {
+        navigate(`/result/${nisn}`);
+      } else {
+        setError('Siswa dengan NISN tersebut tidak ditemukan');
+      }
+    } catch (err) {
+      setError('Terjadi kesalahan saat mengambil data');
     }
-
-    navigate(`/result/${inputNISN}`);
   };
 
   return (
-    <div className="bg-blue-500 flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-8">
-          <span className="text-blue-200">SKL</span>{' '}
-          <span className="text-yellow-400">Online</span>
-        </h1>
-        
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
-          <h2 className="text-2xl font-bold mb-4">Cek Informasi Kelulusan</h2>
-          <p className="text-gray-600 mb-6">Silahkan masukkan NISN anda</p>
-          
-          <form onSubmit={handleSearch}>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center border rounded-lg overflow-hidden">
+    <div className="bg-primary min-vh-100 d-flex align-items-center">
+      <div className="container">
+        <div className="text-center">
+          <h1 className="display-1 fw-bold text-white mb-4">
+            <span className="text-light">SKL</span>{' '}
+            <span className="text-warning">Online</span>
+          </h1>
+          <div className="card p-4">
+            <h2 className="h4 fw-bold mb-3">Cek Informasi Kelulusan</h2>
+            <p className="text-muted mb-4">Silahkan masukkan NISN anda</p>
+            <form onSubmit={handleSearch}>
+              <div className="input-group">
                 <input
                   type="text"
                   name="nisn"
-                  placeholder="Contoh: 1234567890"
-                  className="flex-grow p-2 outline-none"
-                  onChange={(e) => {
-                    e.target.value = e.target.value.replace(/\D/g, '');
-                    setError('');
-                  }}
+                  className="form-control"
+                  placeholder="NISN"
+                  aria-label="NISN"
+                  required
                 />
-                <button
-                  type="submit"
-                  className="bg-green-500 text-white px-4 py-2 hover:bg-green-600 transition-colors"
-                >
+                <button className="btn btn-warning" type="submit">
                   CARI
                 </button>
               </div>
               {error && (
-                <div className="text-red-500 text-sm flex items-center gap-1">
-                  <FontAwesomeIcon icon={faExclamationCircle} />
-                  <span>{error}</span>
+                <div className="mt-3 alert alert-danger">
+                  {error}
                 </div>
               )}
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -116,92 +133,125 @@ function ResultPage() {
 
   if (loading) {
     return (
-      <div className="bg-blue-500 min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Memuat data...</div>
+      <div className="bg-primary min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-white h4">Memuat data...</div>
       </div>
     );
   }
 
   if (error || !siswa) {
     return (
-      <div className="bg-blue-500 min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md text-center">
-          <div className="text-red-500 mb-4 flex flex-col items-center">
-            <FontAwesomeIcon icon={faExclamationCircle} className="text-4xl mb-2" />
-            <p className="text-lg">{error}</p>
-          </div>
-          <button
-            onClick={() => navigate('/')}
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-          >
-            <FontAwesomeIcon icon={faHome} className="mr-2" />
-            Kembali ke Beranda
-          </button>
+      <div className="bg-primary min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="bg-white p-4 rounded shadow-lg max-w-md text-center">
+        <div className="text-danger mb-4 d-flex flex-column align-items-center">
+          <FontAwesomeIcon icon={faExclamationCircle} className="text-danger mb-2" style={{ fontSize: '2.5rem' }} />
+          <p className="h5">{error}</p>
         </div>
+        <button
+          onClick={() => navigate('/')}
+          className="btn btn-primary px-4 py-2"
+        >
+          <FontAwesomeIcon icon={faHome} className="me-2" />
+          Kembali ke Beranda
+        </button>
       </div>
+    </div>
     );
   }
 
   return (
-    <div className="bg-blue-500 min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
-        <h1 className="text-3xl font-bold text-center mb-6">Informasi Kelulusan</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col items-center">
-            {siswa.foto && (
-              <img
-                src={`${siswa.foto}`}
-                style={{ width: '85px', height: '113px' }}
-                alt="Foto Siswa"
-                className="w-48 h-48 rounded-full object-cover mb-4 border-4 border-blue-200"
-              />
-            )}
-            <h2 className="text-2xl font-bold text-center mb-2">{siswa.nama}</h2>
-            <p className="text-gray-600">NISN: {siswa.nisn}</p>
+    <div className="bg-primary min-vh-100 d-flex align-items-center py-4">
+      <div className="container">
+        <div className="card shadow-lg">
+          <div className="card-header bg-warning">
+            <h1 className="h2 fw-bold text-center text-white mb-0">INFORMASI KELULUSAN</h1>
           </div>
+          
+          <div className="card-body">
+            <div className="row g-4">
+              {/* Kolom Foto */}
+              <div className="col-md-4 text-center">
+                <div className="card h-100 border-warning">
+                  <div className="card-body">
+                    {siswa.foto && (
+                      <img
+                        src={`${siswa.foto}`}
+                        alt="Foto Siswa"
+                        className="img-fluid rounded-circle shadow-sm border border-warning"
+                        style={{ width: '200px', height: '200px', objectFit: 'cover' }}
+                      />
+                    )}
+                    <h2 className="h4 fw-bold mt-3 mb-0">{siswa.nama}</h2>
+                    <p className="text-muted">NISN: {siswa.nisn}</p>
+                  </div>
+                </div>
+              </div>
 
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">Tanggal Lahir</h3>
-              <p className="text-gray-700">
-                {new Date(siswa.tanggal_lahir).toLocaleDateString('id-ID', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </p>
-            </div>
+              {/* Kolom Informasi */}
+              <div className="col-md-8">
+                <div className="row g-4">
+                  {/* Tanggal Lahir */}
+                  <div className="col-12">
+                    <div className="card h-100">
+                      <div className="card-header bg-light">
+                        <h3 className="h5 fw-bold mb-0">📅 Tanggal Lahir</h3>
+                      </div>
+                      <div className="card-body">
+                        <p className="display-6 text-center text-primary mb-0">
+                          {new Date(siswa.tanggal_lahir).toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-            <div>
-              <h3 className="text-lg font-semibold">Status Kelulusan</h3>
-              <div className={`p-2 rounded-lg ${
-                siswa.status === 'LULUS' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-                }`}>
-                <span className="font-bold">{siswa.status}</span>
+                  {/* Status Kelulusan */}
+                  <div className="col-12">
+                    <div className={`card h-100 border-3 ${
+                      siswa.status === 'LULUS' ? 'border-success' : 'border-danger'
+                    }`}>
+                      <div className="card-header bg-white">
+                        <h3 className="h5 fw-bold mb-0">🎓 Status Kelulusan</h3>
+                      </div>
+                      <div className={`card-body text-center py-4 ${
+                        siswa.status === 'LULUS' ? 'bg-success' : 'bg-danger'
+                      }`}>
+                        <div className="display-3 fw-bold text-white">
+                          {siswa.status}
+                          {siswa.status === 'LULUS' ? 
+                            <span className="ms-2">🎉</span> : 
+                            <span className="ms-2">😞</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-8 flex justify-center space-x-4">
-          <button
-            onClick={handlePrint}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded transition-all"
-          >
-            <FontAwesomeIcon icon={faPrint} className="mr-2" />
-            Cetak SKL
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded transition-all"
-          >
-            <FontAwesomeIcon icon={faHome} className="mr-2" />
-            Kembali ke Beranda
-          </button>
+          {/* Footer Card */}
+          <div className="card-footer bg-light">
+            <div className="d-flex flex-column flex-md-row justify-content-center gap-3">
+              <button
+                onClick={handlePrint}
+                className="btn btn-warning btn-lg px-5 py-2"
+              >
+                <FontAwesomeIcon icon={faPrint} className="me-2" />
+                Cetak SKL
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="btn btn-outline-primary btn-lg px-5 py-2"
+              >
+                <FontAwesomeIcon icon={faHome} className="me-2" />
+                Kembali ke Beranda
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
