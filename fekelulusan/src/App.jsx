@@ -12,26 +12,9 @@ function HomePage() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
-  // const handleSearch = async (e) => {
-  //   e.preventDefault();
-  //   const inputNISN = e.target.nisn.value.trim();
-    
-  //   if (!inputNISN) {
-  //     setError('NISN tidak boleh kosong');
-  //     return;
-  //   }
-
-  //   if (!/^\d+$/.test(inputNISN)) {
-  //     setError('NISN harus berupa angka');
-  //     return;
-  //   }
-
-  //   navigate(`/result/${inputNISN}`);
-  // };
-
   const handleSearch = async (e) => {
     e.preventDefault();
-    const nisn = e.target.nisn.value;
+    const nisn = e.target.nisn.value.trim();
   
     if (!nisn) {
       setError('NISN tidak boleh kosong');
@@ -39,15 +22,19 @@ function HomePage() {
     }
   
     try {
-      // const response = await axios.get(`http://127.0.0.1:8000/api/siswa/?nisn=${nisn}`);
       const response = await axios.get(`http://localhost:8000/api/siswa/?nisn=${nisn}`);
+      
       if (response.data) {
         navigate(`/result/${nisn}`);
       } else {
-        setError('Siswa dengan NISN tersebut tidak ditemukan');
+        setError('Data siswa tidak ditemukan');
       }
     } catch (err) {
-      setError('Terjadi kesalahan saat mengambil data');
+      if (err.response?.status === 404) {
+        setError('Siswa dengan NISN tersebut tidak ditemukan');
+      } else {
+        setError('Terjadi kesalahan server');
+      }
     }
   };
 
@@ -102,23 +89,14 @@ function ResultPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/siswa/?nisn=${nisn}`);
-        
-        if (response.data.length === 0) {
-          setError(`Siswa dengan NISN ${nisn} tidak ditemukan`);
-          return;
-        }
-
-        const siswaData = response.data[0];
-        
-        // Validasi kesesuaian NISN
-        if (siswaData.nisn !== nisn) {
-          setError('NISN tidak sesuai dengan data siswa');
-          return;
-        }
-
-        setSiswa(siswaData);
+        setSiswa(response.data);
+        setError('');
       } catch (err) {
-        setError('Terjadi kesalahan saat mengambil data');
+        if (err.response?.status === 404) {
+          setError(`Siswa dengan NISN ${nisn} tidak ditemukan`);
+        } else {
+          setError('Terjadi kesalahan server');
+        }
       } finally {
         setLoading(false);
       }
@@ -126,6 +104,7 @@ function ResultPage() {
 
     fetchData();
   }, [nisn]);
+
 
   const handlePrint = () => {
     window.open(`http://localhost:8000/api/siswa/${siswa.id}/generate_skl/`, '_blank');

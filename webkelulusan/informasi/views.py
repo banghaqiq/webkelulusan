@@ -1,7 +1,7 @@
 from django.http import FileResponse
-from reportlab.pdfgen import canvas # type: ignore
+from reportlab.pdfgen import canvas  # type: ignore
 from io import BytesIO
-from rest_framework.decorators import APIView
+from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -20,37 +20,21 @@ class SiswaViewSet(viewsets.ModelViewSet):
         return Response({'status': 'foto deleted'})
     
     
-class SiswaSearchView(APIView):
-    def get(self, request):
-        nisn = request.query_params.get('nisn', None)
-        if nisn:
-            siswa = Siswa.objects.filter(nisn=nisn)
-            if siswa.exists():
-                serializer = SiswaSerializer(siswa.first())
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "Siswa tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
-        return Response({"error": "NISN tidak boleh kosong"}, status=status.HTTP_400_BAD_REQUEST)
-
-# @api_view(['GET'])
-# def cek_kelulusan(request):
-#     nisn = request.query_params.get('nisn', None)
+@api_view(['GET'])
+def search_siswa(request):
+    nisn = request.GET.get('nisn', None)
     
-#     if not nisn:
-#         return Response(
-#             {"error": "NISN harus diisi"}, 
-#             status=status.HTTP_400_BAD_REQUEST
-#         )
+    if not nisn:
+        return Response({"error": "Parameter NISN diperlukan"}, status=status.HTTP_400_BAD_REQUEST)
     
-#     try:
-#         siswa = Siswa.objects.get(nisn=nisn)  # Cari siswa berdasarkan NISN
-#         serializer = SiswaSerializer(siswa)
-#         return Response(serializer.data)
-#     except Siswa.DoesNotExist:
-#         return Response(
-#             {"error": "Siswa dengan NISN tersebut tidak ditemukan"}, 
-#             status=status.HTTP_404_NOT_FOUND
-#         )
+    try:
+        siswa = Siswa.objects.get(nisn=nisn)  # Cari siswa berdasarkan NISN
+        serializer = SiswaSerializer(siswa)   # Serialize data siswa
+        return Response(serializer.data)      # Kembalikan data siswa
+    except Siswa.DoesNotExist:
+        return Response({"error": "Siswa tidak ditemukan"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def generate_skl(request, siswa_id):
     siswa = Siswa.objects.get(id=siswa_id)
